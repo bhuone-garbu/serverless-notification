@@ -3,19 +3,26 @@ import AWS from 'aws-sdk';
 const ses = new AWS.SES({ region: 'eu-west-2' });
 
 async function sendMail(event, context) {
+
+  const record = event.Records[0];
+  console.log('record processing: ', record);
+
+  const email = JSON.parse(record.body);
+  const { subject, body, recipient } = email;
+
   const params = {
     Source: process.env.PRIVATE_EMAIL,
     Destination: {
-      ToAddresses: [process.env.PRIVATE_EMAIL],
+      ToAddresses: [recipient],
     },
     Message: {
       Body: {
         Text: {
-          Data: 'Hello fom bhuone-garbu'
+          Data: body
         }
       },
       Subject: {
-        Data: 'Test Mail'
+        Data: subject
       }
     }
   };
