@@ -1,0 +1,29 @@
+service: serverless-notification
+
+plugins:
+  - serverless-bundle
+  - serverless-pseudo-parameters
+  - serverless-dotenv-plugin
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  memorySize: 256
+  region: eu-west-2
+  stage: ${opt:stage, 'dev'}
+  environment:
+    PRIVATE_EMAIL: ${env:PRIVATE_EMAIL}
+  iamRoleStatements:
+    - ${file(iam/send-mail.yml):SendMailIAM}
+  
+functions:
+  sendMail:
+    handler: src/handlers/sendMail.handler
+
+custom:
+  bundle:
+    linting: false
+  dotenv:
+    path: .env
+    include:
+      - PRIVATE_EMAIL
